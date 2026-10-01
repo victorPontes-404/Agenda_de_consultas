@@ -1,27 +1,33 @@
 package com.portfolio.sistemaDeAgendamento.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "patients")
-@DiscriminatorValue("PATIENT")
-public class UserPatient extends User {
+@Table(name = "units")
+public class Unit {
 
-    @NotNull
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
     @Column(nullable = false)
-    private LocalDate birthDate;
+    private String name;
 
+
+    // a convenção esta certo botar o "_" a IA sugeriu assim essa parte
     @Embedded
     @AttributeOverrides({
         @AttributeOverride(name = "street",       column = @Column(name = "address_street")),
@@ -30,7 +36,21 @@ public class UserPatient extends User {
         @AttributeOverride(name = "neighborhood", column = @Column(name = "address_neighborhood")),
         @AttributeOverride(name = "city",         column = @Column(name = "address_city")),
         @AttributeOverride(name = "state",        column = @Column(name = "address_state")),
-        @AttributeOverride(name = "zipCode",      column = @Column(name = "address_zip_code"))
+        @AttributeOverride(name = "cep",      column = @Column(name = "address_cep"))
     })
-    private Address address; // opcional iqual no RF01
+    private Address address;
+
+    @NotBlank
+    @Column(nullable = false, length = 20)
+    private String phone;
+
+
+    @Column(name = "business_hours")
+    private String businessHours; // aqui seria uma string ou um Date type?
+
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    @ManyToMany(mappedBy = "units")
+    private Set<UserDoctor> doctors = new HashSet<>();
 }
