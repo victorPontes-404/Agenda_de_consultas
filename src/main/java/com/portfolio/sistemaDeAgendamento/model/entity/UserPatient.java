@@ -30,7 +30,7 @@ public class UserPatient extends User {
         @AttributeOverride(name = "neighborhood", column = @Column(name = "address_neighborhood")),
         @AttributeOverride(name = "city",         column = @Column(name = "address_city")),
         @AttributeOverride(name = "state",        column = @Column(name = "address_state")),
-        @AttributeOverride(name = "cep",      column = @Column(name = "address_cep"))
+        @AttributeOverride(name = "cep",          column = @Column(name = "address_cep"))
     })
     private Address address; // opcional iqual no RF01
 }
