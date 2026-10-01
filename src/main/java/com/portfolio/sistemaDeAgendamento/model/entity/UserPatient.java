@@ -18,19 +18,11 @@ import java.time.LocalDate;
 @DiscriminatorValue("PATIENT")
 public class UserPatient extends User {
 
-    @NotNull
     @Column(nullable = false)
     private LocalDate birthDate;
 
-    @Embedded
-    @AttributeOverrides({
-        @AttributeOverride(name = "street",       column = @Column(name = "address_street")),
-        @AttributeOverride(name = "number",       column = @Column(name = "address_number")),
-        @AttributeOverride(name = "complement",   column = @Column(name = "address_complement")),
-        @AttributeOverride(name = "neighborhood", column = @Column(name = "address_neighborhood")),
-        @AttributeOverride(name = "city",         column = @Column(name = "address_city")),
-        @AttributeOverride(name = "state",        column = @Column(name = "address_state")),
-        @AttributeOverride(name = "cep",          column = @Column(name = "address_cep"))
-    })
-    private Address address; // opcional iqual no RF01
+    public UserPatient(String email, String phone, String cpf, String name, LocalDate birthDate) {
+        super(email, phone, cpf, name);
+        this.birthDate = birthDate;
+    }
 }

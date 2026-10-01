@@ -22,11 +22,10 @@ public class Specialty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(nullable = false, unique = true)
     private String name;
 
-    private String description;
+    private String description; //opcional
 
     @ManyToMany(mappedBy = "specialties")
     private Set<UserDoctor> doctors = new HashSet<>();
