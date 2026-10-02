@@ -1,12 +1,12 @@
 name: Pipeline CI - Sistema de Agendamento 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "Dev" ]
     paths:
       - 'sistemaDeAgendamento/**'
 
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "Dev" ]
     paths:
       - 'sistemaDeAgendamento/**'
 
