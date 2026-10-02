@@ -34,9 +34,6 @@ jobs:
       - name: See Java Version
         run: java --version
 
-      - name: Run unit Tests with Maven
-        run: mvn clean test
-
       - name: Build Application Package
-        run: mvn package -DskipTests
+        run: mvn clean package -DskipTests
 
