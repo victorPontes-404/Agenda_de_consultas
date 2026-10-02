@@ -51,4 +51,12 @@ public class Unit {
 
     @ManyToMany(mappedBy = "units")
     private Set<UserDoctor> doctors = new HashSet<>();
+
+    public Unit(String name, Address address, String phone) {
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+
+        this.active = true;
+    }
 }

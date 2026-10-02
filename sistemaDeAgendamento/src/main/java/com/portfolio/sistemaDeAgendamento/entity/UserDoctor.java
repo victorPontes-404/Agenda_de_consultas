@@ -37,4 +37,9 @@ public class UserDoctor extends User {
             inverseJoinColumns = @JoinColumn(name = "unit_id")
     )
     private Set<Unit> units = new HashSet<>();
+
+    public UserDoctor(String email, String phone, String cpf, String name, String professionalRegistration) {
+        super(email, phone, cpf, name);
+        this.professionalRegistration = professionalRegistration;
+    }
 }
