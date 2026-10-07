@@ -1,0 +1,60 @@
+package com.portfolio.sistemaDeAgendamento.config;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.portfolio.sistemaDeAgendamento.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
+
+@Service
+@RequiredArgsConstructor
+public class TokenService {
+
+    @Value("${agendai.jwt.secret.key}")
+    private String secretKey;
+
+    public String generateToken(User user) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
+
+            return JWT.create()
+                    .withSubject(user.getId().toString())
+                    .withIssuedAt(Date.from(Instant.now()))
+                    .withIssuer("agendai-api")
+                    .withExpiresAt(generateExpirationDate())
+                    .sign(algorithm);
+
+
+        } catch (JWTCreationException exception) {
+            throw new JWTCreationException("Erro ao gerar token JWT: ", exception);
+        }
+    }
+
+    public String extractSubject(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
+
+            return JWT.require(algorithm)
+                    .withIssuer("agendai-api")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        } catch (JWTVerificationException exception) {
+            throw new JWTVerificationException("Erro ao verificar token JWT: ", exception);
+        }
+    }
+
+    private final Instant generateExpirationDate() {
+        return LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.of("-03:00"));
+    }
+
+
+}

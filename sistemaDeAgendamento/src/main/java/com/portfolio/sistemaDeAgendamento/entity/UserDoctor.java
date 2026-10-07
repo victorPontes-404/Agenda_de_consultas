@@ -1,5 +1,6 @@
 package com.portfolio.sistemaDeAgendamento.entity;
 
+import com.portfolio.sistemaDeAgendamento.entity.Enum.Roles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,5 +42,6 @@ public class UserDoctor extends User {
     public UserDoctor(String email, String phone, String cpf, String name, String professionalRegistration) {
         super(email, phone, cpf, name);
         this.professionalRegistration = professionalRegistration;
+        this.setRole(Roles.DOCTOR);
     }
 }
