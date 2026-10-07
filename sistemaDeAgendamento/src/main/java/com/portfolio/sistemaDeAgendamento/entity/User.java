@@ -26,7 +26,6 @@ public abstract class User {
     @Column(nullable = false)
     private String name;
 
-    @CPF
     @Column(nullable = false, unique = true, length = 14)
     private String cpf;
 
