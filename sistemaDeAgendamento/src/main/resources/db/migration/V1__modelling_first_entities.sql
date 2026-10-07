@@ -18,7 +18,7 @@ CREATE TABLE users (
 
 CREATE TABLE patients (
     id                   BIGINT          PRIMARY KEY REFERENCES users(id),
-    birth_date           DATE            NOT NULL,
+    birth_date           DATE            NOT NULL
 );
 
 CREATE TABLE specialties (
