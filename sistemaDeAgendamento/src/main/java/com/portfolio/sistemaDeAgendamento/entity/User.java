@@ -1,12 +1,18 @@
 package com.portfolio.sistemaDeAgendamento.entity;
 
+import com.portfolio.sistemaDeAgendamento.entity.Enum.Roles;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.br.CPF;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,7 +22,7 @@ import org.hibernate.validator.constraints.br.CPF;
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
-public abstract class User {
+public abstract class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +44,11 @@ public abstract class User {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @Enumerated(EnumType.STRING)
+    protected Roles role;
+
+    private String password;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "street",       column = @Column(name = "address_street")),
@@ -58,4 +69,30 @@ public abstract class User {
 
         this.active = true;
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.role == null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return Boolean.TRUE.equals(this.active);
+    }
+
+
 }
