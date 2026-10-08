@@ -5,8 +5,8 @@ import com.portfolio.sistemaDeAgendamento.config.CookieService;
 import com.portfolio.sistemaDeAgendamento.config.TokenService;
 import com.portfolio.sistemaDeAgendamento.dto.body.LoginBody;
 import com.portfolio.sistemaDeAgendamento.dto.body.RegisterPatientBody;
+import com.portfolio.sistemaDeAgendamento.dto.response.UserResponse;
 import com.portfolio.sistemaDeAgendamento.entity.Address;
-import com.portfolio.sistemaDeAgendamento.entity.Enum.Roles;
 import com.portfolio.sistemaDeAgendamento.entity.User;
 import com.portfolio.sistemaDeAgendamento.entity.UserPatient;
 import com.portfolio.sistemaDeAgendamento.exception.AuthException;
@@ -35,34 +35,34 @@ public class AuthService {
 
 
     @Transactional
-    public void registerAndLoginPatient(RegisterPatientBody dto, HttpServletResponse response) {
-        if (userRepository.existsByEmail(dto.email())) {
+    public UserResponse register(RegisterPatientBody body, HttpServletResponse response) {
+        if (userRepository.existsByEmail(body.email())) {
             throw new ConflictException("E-mail já cadastrado");
         }
 
-        if (userRepository.existsByCpf(dto.cpf())) {
+        if (userRepository.existsByCpf(body.cpf())) {
             throw new ConflictException("CPF já cadastrado");
         }
 
-        Address address = toAddress(dto.address());
+        Address address = toAddress(body.address());
 
         User patient = new UserPatient(
-                dto.email(),
-                dto.phone(),
-                dto.cpf(),
-                dto.name(),
-                dto.birthDate()
+                body.email(),
+                body.phone(),
+                body.cpf(),
+                body.name(),
+                body.birthDate()
         );
 
-        patient.setPassword(passwordEncoder.encode(dto.password()));
+        patient.setPassword(passwordEncoder.encode(body.password()));
         patient.setAddress(address);
         userRepository.save(patient);
-
         issueTokens(patient, response);
+        return UserResponse.from(patient);
     }
 
-    public void login(LoginBody dto, HttpServletResponse response) {
-        User user = userRepository.findByEmail(dto.email())
+    public UserResponse login(LoginBody body, HttpServletResponse response) {
+        User user = userRepository.findByEmail(body.email())
                 .orElseThrow(() -> new AuthException("credenciais invalidas"));
 
         if (!user.isEnabled()) {
@@ -72,8 +72,8 @@ public class AuthService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            dto.email(),
-                            dto.password()
+                            body.email(),
+                            body.password()
                     )
             );
         } catch (BadCredentialsException e) {
@@ -81,6 +81,7 @@ public class AuthService {
         }
 
         issueTokens(user, response);
+        return UserResponse.from(user);
     }
 
     public void refresh(String rawRefreshToken, HttpServletResponse response) {
