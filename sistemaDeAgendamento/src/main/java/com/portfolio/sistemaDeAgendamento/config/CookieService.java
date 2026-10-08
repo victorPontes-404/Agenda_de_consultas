@@ -56,4 +56,19 @@ public class CookieService {
         res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
+    public void cookiesToExpire(HttpServletResponse res) {
+        expireCookie(res, ACCESS_COOKIE, "/");
+        expireCookie(res, REFRESH_COOKIE, "/agendai/auth");
+    }
+
+    private void expireCookie(HttpServletResponse res, String name, String path) {
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .httpOnly(true)
+                .path(path)
+                .maxAge(Duration.ZERO)
+                .build();
+
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
 }
