@@ -45,8 +45,10 @@ public abstract class User implements UserDetails {
     private Boolean active = true;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     protected Roles role;
 
+    @Column(nullable = false)
     private String password;
 
     @Embedded
