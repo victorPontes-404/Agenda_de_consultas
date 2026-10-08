@@ -25,12 +25,10 @@ public class CorsConfig {
         ));
 
         config.setAllowedHeaders(List.of(
-                "Authorization",
                 "Content-Type",
-                "Accept"
+                "Accept",
+                "X-XSRF-TOKEN"
         ));
-
-        config.setExposedHeaders(List.of("Authorization"));
 
         config.setAllowCredentials(true);
 
