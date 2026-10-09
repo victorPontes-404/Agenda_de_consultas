@@ -24,7 +24,7 @@ public class TokenService {
 
     public TokenService (
         @Value("${agendai.jwt.secret.key}") String secretKey,
-        @Value("${agendai.jwt.acess-token-minutes}") long accessTokenMinutes) {
+        @Value("${agendai.jwt.access-token-minutes}") long accessTokenMinutes) {
 
         this.algorithm = Algorithm.HMAC256(secretKey);
         this.verifier = JWT.require(algorithm).withIssuer(ISSUER).build();

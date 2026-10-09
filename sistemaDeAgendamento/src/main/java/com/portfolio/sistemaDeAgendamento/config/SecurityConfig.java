@@ -35,15 +35,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .ignoringRequestMatchers("/api/auth/login")
+                        .ignoringRequestMatchers(
+                                "/agendai/auth/register/patient",
+                                "/agendai/auth/login",
+                                "/agendai/auth/refresh",
+                                "/agendai/auth/logout"
+                        )
                 ).sessionManagement(
                         s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 ).authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/agendai/auth/login", "/agendai/auth/refresh", "/agendai/auth/logout").permitAll()
+                        .requestMatchers("/agendai/auth/register/patient","/agendai/auth/login", "/agendai/auth/refresh", "/agendai/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/agendai/users").permitAll()
                         .anyRequest().authenticated()
-                ).exceptionHandling(e -> e
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                )
                 .addFilterBefore(requestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
