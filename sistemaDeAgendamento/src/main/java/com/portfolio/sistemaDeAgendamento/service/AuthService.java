@@ -42,7 +42,6 @@ public class AuthService {
             throw new ConflictException("CPF já cadastrado");
         }
 
-
         User patient = new UserPatient(
                 body.email(),
                 body.phone(),
@@ -58,7 +57,7 @@ public class AuthService {
     }
 
     public UserResponse login(LoginBody body, HttpServletResponse response) {
-        User user = userRepository.findByEmail(body.email())
+        User user = userRepository.findByEmail(body.email().toLowerCase().trim())
                 .orElseThrow(() -> new AuthException("credenciais invalidas"));
 
         if (!user.isEnabled()) {
