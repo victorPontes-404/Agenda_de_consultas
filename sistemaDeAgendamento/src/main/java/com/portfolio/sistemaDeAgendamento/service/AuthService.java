@@ -6,7 +6,6 @@ import com.portfolio.sistemaDeAgendamento.config.TokenService;
 import com.portfolio.sistemaDeAgendamento.dto.body.LoginBody;
 import com.portfolio.sistemaDeAgendamento.dto.body.RegisterPatientBody;
 import com.portfolio.sistemaDeAgendamento.dto.response.UserResponse;
-import com.portfolio.sistemaDeAgendamento.entity.Address;
 import com.portfolio.sistemaDeAgendamento.entity.User;
 import com.portfolio.sistemaDeAgendamento.entity.UserPatient;
 import com.portfolio.sistemaDeAgendamento.exception.AuthException;
@@ -20,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.portfolio.sistemaDeAgendamento.dto.body.AddressBody.toAddress;
 
 @Service
 @RequiredArgsConstructor
