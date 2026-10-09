@@ -44,7 +44,6 @@ public class AuthService {
             throw new ConflictException("CPF já cadastrado");
         }
 
-        Address address = toAddress(body.address());
 
         User patient = new UserPatient(
                 body.email(),
@@ -55,7 +54,6 @@ public class AuthService {
         );
 
         patient.setPassword(passwordEncoder.encode(body.password()));
-        patient.setAddress(address);
         userRepository.save(patient);
         issueTokens(patient, response);
         return UserResponse.from(patient);
