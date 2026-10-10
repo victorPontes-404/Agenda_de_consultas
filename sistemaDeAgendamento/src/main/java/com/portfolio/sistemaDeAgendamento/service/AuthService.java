@@ -14,10 +14,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Locale;
 
 
 @Service
@@ -57,26 +61,24 @@ public class AuthService {
     }
 
     public UserResponse login(LoginBody body, HttpServletResponse response) {
-        User user = userRepository.findByEmail(body.email().toLowerCase().trim())
-                .orElseThrow(() -> new AuthException("credenciais invalidas"));
-
-        if (!user.isEnabled()) {
-            throw new AuthException("conta desativada");
-        }
-
         try {
-            authenticationManager.authenticate(
+            Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            body.email(),
+                            body.email().toLowerCase().trim(),
                             body.password()
                     )
             );
-        } catch (BadCredentialsException e) {
+
+            User user = (User) auth.getPrincipal();
+            issueTokens(user, response);
+            return UserResponse.from(user);
+        }
+        catch (BadCredentialsException e) {
             throw new AuthException("credenciais invalidas");
+        } catch (DisabledException e) {
+            throw new AuthException("Conta desativada");
         }
 
-        issueTokens(user, response);
-        return UserResponse.from(user);
     }
 
     public void refresh(String rawRefreshToken, HttpServletResponse response) {
