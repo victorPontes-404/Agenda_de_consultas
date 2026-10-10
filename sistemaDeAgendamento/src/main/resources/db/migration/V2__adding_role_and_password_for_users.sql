@@ -1,0 +1,13 @@
+ALTER TABLE users
+    ADD COLUMN role VARCHAR(50) NOT NULL,
+    ADD COLUMN password VARCHAR(255) NOT NULL;
+
+
+CREATE TABLE refresh_tokens (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expiry_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_refresh_tokens_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

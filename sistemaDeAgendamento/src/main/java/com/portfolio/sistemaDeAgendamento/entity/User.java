@@ -45,8 +45,10 @@ public abstract class User implements UserDetails {
     private Boolean active = true;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     protected Roles role;
 
+    @Column(nullable = false)
     private String password;
 
     @Embedded
@@ -62,12 +64,16 @@ public abstract class User implements UserDetails {
     private Address address;
 
     public User(String email, String phone, String cpf, String name) {
-        this.email = email;
+        this.email = email.toLowerCase();
         this.phone = phone;
         this.cpf = cpf;
         this.name = name;
 
         this.active = true;
+    }
+
+    public void setEmail(String email) {
+        this.email = email != null ? email.toLowerCase() : null;
     }
 
     @Override

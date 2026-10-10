@@ -1,55 +1,57 @@
 package com.portfolio.sistemaDeAgendamento.config;
 
-import com.portfolio.sistemaDeAgendamento.Repository.UserRepository;
-import com.portfolio.sistemaDeAgendamento.exception.TokenNotFoundException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
 public class RequestFilter extends OncePerRequestFilter {
 
-    private final UserRepository userRepository;
     private final TokenService tokenService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
 
-        String token = extrairToken(request);
+        String token = extractToken(request);
 
-        if (token != null) {
-            String subject = tokenService.extractSubject(token);
-
-            if (subject != null) {
-                userRepository.findById(Long.parseLong(subject)).ifPresent(user -> {
-                    var authenticationToken = new UsernamePasswordAuthenticationToken(
-                            user,
-                            null,
-                            user.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                });
+        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            DecodedJWT jwt = tokenService.verify(token);
+            if (jwt != null) {
+                var authorities = List.of(new SimpleGrantedAuthority(
+                        "ROLE_" + jwt.getClaim("role").asString()));
+                var auth = new UsernamePasswordAuthenticationToken(
+                        Long.valueOf(jwt.getSubject()),
+                        null,
+                        authorities
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
-        } else { throw new  TokenNotFoundException("Couldn't find bearer token or it doesn't exist"); }
-        filterChain.doFilter(request, response);
+        }
+        chain.doFilter(request, response);
     }
 
-    private String extrairToken(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-
-        if (token != null && token.startsWith("Bearer ")) {
-            return token.replace("Bearer ", "");
-        } else return null;
+    private String extractToken(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        return Arrays.stream(request.getCookies())
+                .filter(c -> CookieService.ACCESS_COOKIE.equals(c.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
-
-
 }
